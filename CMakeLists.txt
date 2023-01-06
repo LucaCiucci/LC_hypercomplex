@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(LC_hypercomplex LANGUAGES CXX)
+message(STATUS "Project: ${PROJECT_NAME} ${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 
 set(LC_hypercomplex_MAIN_PROJECT OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
