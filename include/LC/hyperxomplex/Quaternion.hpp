@@ -2,8 +2,14 @@
 
 #include <LC/math/linalg/Vector/Vector.hpp>
 
+
 namespace lc
 {
+	using ::abs;
+	using ::sqrt;
+	using ::exp;
+	using ::log;
+
 	// ================================================================
 	//                          QUATERNION
 	// ================================================================
@@ -208,6 +214,12 @@ namespace lc
 	// ================================
 
 	// TODO
+
+	//template <class T>
+	//constexpr lc::Quaternion<T> sin(const lc::Quaternion<T>& q);
+
+	//template <class T>
+	//constexpr lc::Quaternion<T> cos(const lc::Quaternion<T>& q);
 
 	// ================================
 	//           HYPERBOLIC
@@ -576,122 +588,120 @@ namespace lc
 		tmp /= right;
 		return tmp;
 	}
-}
 
-// ================================================================
-//                       external functions
-// ================================================================
+	// ================================================================
+	//                       external functions
+	// ================================================================
 
-// ================================
-//             BASIC
-// ================================
+	// ================================
+	//             BASIC
+	// ================================
 
-////////////////////////////////////////////////////////////////
-template <class T>
-T abs(const lc::Quaternion<T>& q)
-{
-	return q.norm();
-}
-
-// ================================
-//          EXPONENTIAL
-// ================================
-
-namespace lc::priv
-{
-	// TODO sposta
-	// nota funziona solo per tipi reali e potrebbe non essere corretta per complessi o ipercomplessi!!!!
+	////////////////////////////////////////////////////////////////
 	template <class T>
-	inline T sinx_over_x(T x, const T& approx_space)
+	T abs(const lc::Quaternion<T>& q)
 	{
-		T real_approx_space = abs(approx_space);
-		T real_x = abs(x);
-		if (real_x >= real_approx_space)
-			return sin(x) / x;
-		else
-		{
-			T t = real_x / real_approx_space;
-			return t * sin(real_approx_space) / real_approx_space + (T(1) - t);
-		}
-
-		// TODO assolutamente: al momento � un interpolazione lineare da 0 a approx_space, ma in realt�
-		// in questo modo se ci sono dei Nan o valori sballati ce li portiamo dietro... � meglio fare
-		// sempre 1 in un primo tratto e poi l'interpolazone in un secondo:
-		//       v- primo tratto costante, cosi' vanno via i Nan
-		// 1->  ___
-		//          \
-		//           \  <- secondo tratto interpolato
-		//            \
-		//               ... poi da qui continua sin(x)/x esplicito ... 
-		// inoltre 't' � calcolato male perch� potrebbe portarsi dietro informazioni sulla derivata che
-		// invece vanno eliminate in quanto deve essere un semplice parametro REALE per l'interpolazione
+		return q.norm();
 	}
-}
 
-////////////////////////////////////////////////////////////////
-template <class T>
-inline constexpr lc::Quaternion<T> lc::exp(const lc::Quaternion<T>& q)
-{
-	using namespace lc;
+	// ================================
+	//          EXPONENTIAL
+	// ================================
 
-	auto v = (Vector3<T>)q;
-	auto norm_v = v.norm();
-	return
-		Quaternion<T>(exp(q.a)) *
-		(
-			Quaternion<T>(cos(norm_v)) +
-			Quaternion<T>(v, 0) * priv::sinx_over_x<T>(norm_v, (T)1e-3)// !!!!!
-		);
-}
+	namespace priv
+	{
+		// TODO sposta
+		// nota funziona solo per tipi reali e potrebbe non essere corretta per complessi o ipercomplessi!!!!
+		template <class T>
+		inline T sinx_over_x(T x, const T& approx_space)
+		{
+			T real_approx_space = abs(approx_space);
+			T real_x = abs(x);
+			if (real_x >= real_approx_space)
+				return sin(x) / x;
+			else
+			{
+				T t = real_x / real_approx_space;
+				return t * sin(real_approx_space) / real_approx_space + (T(1) - t);
+			}
 
-////////////////////////////////////////////////////////////////
-template <class T>
-inline constexpr lc::Quaternion<T> lc::ln(lc::Quaternion<T> q)
-{
-	// TODO da ricontrollare
-	using namespace lc;
+			// TODO assolutamente: al momento � un interpolazione lineare da 0 a approx_space, ma in realt�
+			// in questo modo se ci sono dei Nan o valori sballati ce li portiamo dietro... � meglio fare
+			// sempre 1 in un primo tratto e poi l'interpolazone in un secondo:
+			//       v- primo tratto costante, cosi' vanno via i Nan
+			// 1->  ___
+			//          \
+			//           \  <- secondo tratto interpolato
+			//            \
+			//               ... poi da qui continua sin(x)/x esplicito ... 
+			// inoltre 't' � calcolato male perch� potrebbe portarsi dietro informazioni sulla derivata che
+			// invece vanno eliminate in quanto deve essere un semplice parametro REALE per l'interpolazione
+		}
+	}
 
-	auto norm_q = q.norm();
+	////////////////////////////////////////////////////////////////
+	template <class T>
+	inline constexpr lc::Quaternion<T> exp(const lc::Quaternion<T>& q)
+	{
+		auto v = q.get_vec3();
+		auto norm_v = v.norm();
+		return
+			Quaternion<T>(exp(q.a)) *
+			(
+				Quaternion<T>(cos(norm_v)) +
+				Quaternion<T>(v, 0) * priv::sinx_over_x<T>(norm_v, (T)1e-3)// !!!!!
+			);
+	}
 
-	q /= norm_q;
-	auto v = (Vector3<T>)q;
-	
-	auto sin_teta = v.norm();
+	////////////////////////////////////////////////////////////////
+	template <class T>
+	inline constexpr lc::Quaternion<T> ln(lc::Quaternion<T> q)
+	{
+		// TODO da ricontrollare
+		using namespace lc;
 
-	v *= asin(sin_teta) / sin_teta;
+		auto norm_q = q.norm();
 
-	// TODO clamp i valori prima di arcoseno
+		q /= norm_q;
+		auto v = (Vector3<T>)q;
+		
+		auto sin_teta = v.norm();
 
-	return Quaternion<T>(v, log(norm_q));
+		v *= asin(sin_teta) / sin_teta;
 
-	// TODO pensa: i quaternioni non sono associativi, come fa il log ad essere associativo??????????
-    // https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
-}
+		// TODO clamp i valori prima di arcoseno
 
-////////////////////////////////////////////////////////////////
-template <class T>
-inline constexpr lc::Quaternion<T> lc::log(const lc::Quaternion<T>& q)
-{
-	return ln(q);
-}
+		return Quaternion<T>(v, log(norm_q));
 
-// ================================
-//          TRIGONOMETRIC
-// ================================
+		// TODO pensa: i quaternioni non sono associativi, come fa il log ad essere associativo??????????
+		// https://en.wikipedia.org/wiki/Quaternion#Exponential,_logarithm,_and_power_functions
+	}
 
-// ================================
-//           HYPERBOLIC
-// ================================
+	////////////////////////////////////////////////////////////////
+	template <class T>
+	inline constexpr lc::Quaternion<T> log(const lc::Quaternion<T>& q)
+	{
+		return ln(q);
+	}
 
-// ================================
-//              I/O
-// ================================
+	// ================================
+	//          TRIGONOMETRIC
+	// ================================
 
-////////////////////////////////////////////////////////////////
-template <class T>
-inline std::ostream& lc::operator<<(std::ostream& ostream, const lc::Quaternion<T>& q)
-{
-	ostream << q.a << " + " << q.b << "i + " << q.c << "j + " << q.d << "k";
+	// ================================
+	//           HYPERBOLIC
+	// ================================
 
-	return ostream;
+	// ================================
+	//              I/O
+	// ================================
+
+	////////////////////////////////////////////////////////////////
+	template <class T>
+	inline std::ostream& operator<<(std::ostream& ostream, const lc::Quaternion<T>& q)
+	{
+		ostream << q.a << " + " << q.b << "i + " << q.c << "j + " << q.d << "k";
+
+		return ostream;
+	}
 }
