@@ -2,13 +2,13 @@
 
 #include <LC/math/linalg/Vector/Vector.hpp>
 
-namespace lc::math::algebra
+namespace lc
 {
 	// ================================================================
 	//                          QUATERNION
 	// ================================================================
 
-	template <ScalarType T = Np>
+	template <lc::math::concepts::ScalarType T = double>
 	class Quaternion
 	{
 	public:
@@ -31,12 +31,12 @@ namespace lc::math::algebra
 
 		// copy a quaternion of different type
 		// TODO check convertible
-		template <ScalarType T2>
+		template <lc::math::concepts::ScalarType T2>
 		constexpr Quaternion(const Quaternion<T2>& other);
 
 		// construct a quaternion from a 3d vector and a real part
 		// TODO check convertible
-		template <ScalarType T2>
+		template <lc::math::concepts::ScalarType T2>
 		constexpr Quaternion(const Vector3<T2>& v, const T& real_part = T(1));
 
 		// construct a quaternion from a 4d vector where the fourth component is the real part:
@@ -44,7 +44,7 @@ namespace lc::math::algebra
 		// b = v[0];
 		// c = v[1];
 		// d = v[2];
-		template <ScalarType T2>
+		template <lc::math::concepts::ScalarType T2>
 		constexpr Quaternion(const Vector4<T2>& v);
 
 		// ================================
@@ -174,64 +174,55 @@ namespace lc::math::algebra
 		// the "k" component (a + bi + cj + dk)
 		T d = T();
 	};
+
+	// ================================================================
+	//                       external functions
+	// ================================================================
+
+	// ================================
+	//             BASIC
+	// ================================
+
+	// norm of a quaternion
+	template <class T>
+	T abs(const lc::Quaternion<T>& q);
+
+	// ================================
+	//          EXPONENTIAL
+	// ================================
+
+	// quaterion base 'e' exponential
+	template <class T>
+	constexpr lc::Quaternion<T> exp(const lc::Quaternion<T>& q);
+
+	// quaterion base 'e' logarithm
+	template <class T>
+	constexpr lc::Quaternion<T> ln(lc::Quaternion<T> q);
+
+	// quaterion base 'e' logarithm
+	template <class T>
+	constexpr lc::Quaternion<T> log(const lc::Quaternion<T>& q);
+
+	// ================================
+	//          TRIGONOMETRIC
+	// ================================
+
+	// TODO
+
+	// ================================
+	//           HYPERBOLIC
+	// ================================
+
+	// TODO
+
+	// ================================
+	//              I/O
+	// ================================
+
+	// formatted output
+	template <class T>
+	std::ostream& operator<<(std::ostream& ostream, const lc::Quaternion<T>& q);
 }
-
-namespace lc
-{
-	namespace math
-	{
-		using lc::math::algebra::Quaternion;
-	}
-	using lc::math::algebra::Quaternion;
-}
-
-// ================================================================
-//                       external functions
-// ================================================================
-
-// ================================
-//             BASIC
-// ================================
-
-// norm of a quaternion
-template <class T>
-T abs(const lc::Quaternion<T>& q);
-
-// ================================
-//          EXPONENTIAL
-// ================================
-
-// quaterion base 'e' exponential
-template <class T>
-constexpr lc::Quaternion<T> exp(const lc::Quaternion<T>& q);
-
-// quaterion base 'e' logarithm
-template <class T>
-constexpr lc::Quaternion<T> ln(lc::Quaternion<T> q);
-
-// quaterion base 'e' logarithm
-template <class T>
-constexpr lc::Quaternion<T> log(const lc::Quaternion<T>& q);
-
-// ================================
-//          TRIGONOMETRIC
-// ================================
-
-// TODO
-
-// ================================
-//           HYPERBOLIC
-// ================================
-
-// TODO
-
-// ================================
-//              I/O
-// ================================
-
-// formatted output
-template <class T>
-std::ostream& operator<<(std::ostream& ostream, const lc::Quaternion<T>& q);
 
 
 
@@ -244,7 +235,7 @@ std::ostream& operator<<(std::ostream& ostream, const lc::Quaternion<T>& q);
 // ================================================================================================================================
 // ================================================================================================================================
 
-namespace lc::math::algebra
+namespace lc
 {
 	// ================================================================
 	//                          QUATERNION
@@ -255,7 +246,7 @@ namespace lc::math::algebra
 	// ================================
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>::Quaternion(const T& a, const T& b, const T& c, const T& d) :
 		a(a),
 		b(b),
@@ -265,8 +256,8 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
-	template <ScalarType T2>
+	template <lc::math::concepts::ScalarType T>
+	template <lc::math::concepts::ScalarType T2>
 	inline constexpr Quaternion<T>::Quaternion(const Quaternion<T2>& other) :
 		a(other.a),
 		b(other.b),
@@ -276,8 +267,8 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
-	template <ScalarType T2>
+	template <lc::math::concepts::ScalarType T>
+	template <lc::math::concepts::ScalarType T2>
 	inline constexpr Quaternion<T>::Quaternion(const Vector3<T2>& v, const T& real_part) :
 		a(real_part),
 		b(v[0]),
@@ -287,8 +278,8 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
-	template <ScalarType T2>
+	template <lc::math::concepts::ScalarType T>
+	template <lc::math::concepts::ScalarType T2>
 	inline constexpr Quaternion<T>::Quaternion(const Vector4<T2>& v) :
 		a(v[3]),
 		b(v[0]),
@@ -302,7 +293,7 @@ namespace lc::math::algebra
 	// ================================
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	template <class T2>
 	inline constexpr Vector3<T2> Quaternion<T>::get_vec3(void) const
 	{
@@ -310,7 +301,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	template <class T2>
 	inline constexpr Vector4<T2> Quaternion<T>::get_vec4(void) const
 	{
@@ -322,14 +313,14 @@ namespace lc::math::algebra
 	// ================================
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr T Quaternion<T>::norm(void) const
 	{
 		return sqrt(this->norm2());
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr T Quaternion<T>::norm2(void) const
 	{
 		T sum_v = 0;
@@ -341,7 +332,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::normalize(void)
 	{
 		auto norm = this->norm();
@@ -353,7 +344,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::normalized(void) const
 	{
 		auto tmp = *this;
@@ -363,14 +354,14 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::invert(void)
 	{
 		*this = this->inverse();
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::inverse(void) const
 	{
 		auto conjugate = this->conj();
@@ -378,7 +369,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::conjugate(void)
 	{
 		b = -b;
@@ -388,7 +379,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::conj(void) const
 	{
 		auto tmp = *this;
@@ -397,7 +388,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::flip(void)
 	{
 		a = -a;
@@ -408,7 +399,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::opposite(void) const
 	{
 		auto tmp = *this;
@@ -421,14 +412,14 @@ namespace lc::math::algebra
 	// ================================
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator-(void) const
 	{
 		return this->opposite();
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator+=(const T& right)
 	{
 		a += right;
@@ -439,7 +430,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator+=(const Quaternion<T>& right)
 	{
 		a += right.a;
@@ -450,7 +441,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator+(const T& right) const
 	{
 		auto tmp = *this;
@@ -459,7 +450,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator+(const Quaternion<T>& right) const
 	{
 		auto tmp = *this;
@@ -468,7 +459,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator-=(const T& right)
 	{
 		a -= right;
@@ -479,7 +470,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator-=(const Quaternion<T>& right)
 	{
 		a -= right.a;
@@ -490,7 +481,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator-(const T& right) const
 	{
 		auto tmp = *this;
@@ -499,7 +490,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator-(const Quaternion<T>& right) const
 	{
 		auto tmp = *this;
@@ -508,7 +499,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator*=(const T& right)
 	{
 		a *= right;
@@ -520,7 +511,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& right)
 	{
 		*this = *this + right;
@@ -529,7 +520,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator*(const T& right) const
 	{
 		Quaternion<T> tmp = *this;
@@ -538,7 +529,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion<T>& right) const
 	{
 		return {
@@ -550,7 +541,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator/=(const T& right)
 	{
 		a /= right;
@@ -562,14 +553,14 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T>& Quaternion<T>::operator/=(const Quaternion<T>& right)
 	{
 		*this *= right.inverse();
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator/(const T& right) const
 	{
 		auto tmp = *this;
@@ -578,7 +569,7 @@ namespace lc::math::algebra
 	}
 
 	////////////////////////////////////////////////////////////////
-	template <ScalarType T>
+	template <lc::math::concepts::ScalarType T>
 	inline constexpr Quaternion<T> Quaternion<T>::operator/(const Quaternion<T>& right) const
 	{
 		auto tmp = *this;
@@ -639,7 +630,7 @@ namespace lc::priv
 
 ////////////////////////////////////////////////////////////////
 template <class T>
-inline constexpr lc::Quaternion<T> exp(const lc::Quaternion<T>& q)
+inline constexpr lc::Quaternion<T> lc::exp(const lc::Quaternion<T>& q)
 {
 	using namespace lc;
 
@@ -655,7 +646,7 @@ inline constexpr lc::Quaternion<T> exp(const lc::Quaternion<T>& q)
 
 ////////////////////////////////////////////////////////////////
 template <class T>
-inline constexpr lc::Quaternion<T> ln(lc::Quaternion<T> q)
+inline constexpr lc::Quaternion<T> lc::ln(lc::Quaternion<T> q)
 {
 	// TODO da ricontrollare
 	using namespace lc;
@@ -679,7 +670,7 @@ inline constexpr lc::Quaternion<T> ln(lc::Quaternion<T> q)
 
 ////////////////////////////////////////////////////////////////
 template <class T>
-inline constexpr lc::Quaternion<T> log(const lc::Quaternion<T>& q)
+inline constexpr lc::Quaternion<T> lc::log(const lc::Quaternion<T>& q)
 {
 	return ln(q);
 }
@@ -696,11 +687,9 @@ inline constexpr lc::Quaternion<T> log(const lc::Quaternion<T>& q)
 //              I/O
 // ================================
 
-#include <LC/math/algebra/Differential/Differential_fwd.hpp>// TODO_IMPORTANT !?!?!?!?!!?!?!??!?!?!?!?!?!?!?!?!?!?!!??!?!!?!?!?!?
-
 ////////////////////////////////////////////////////////////////
 template <class T>
-inline std::ostream& operator<<(std::ostream& ostream, const lc::Quaternion<T>& q)
+inline std::ostream& lc::operator<<(std::ostream& ostream, const lc::Quaternion<T>& q)
 {
 	ostream << q.a << " + " << q.b << "i + " << q.c << "j + " << q.d << "k";
 
